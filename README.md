@@ -10,4 +10,4 @@ After each turn, the next player has to play in the board that corresponds to th
 So for example : if player 1 played in the **bottom right** of the top left board, then player 2 has to play wherever he wants to in the **bottom right board**.
 
 If one of the players complete one of the boards, they earn the whole square, replacing the small board with their symbol.
-The first player to align 3 of his symbols on the big board wins. But if no one can do it, it's a tie.
+The first player to align 3 of his symbols on the big board wins. But if no one can, it's a tie.
