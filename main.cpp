@@ -539,22 +539,47 @@ struct Human
 
 };
 
+struct Robot
+{
+    int player;
+    std::string name;
+    std::vector<std::vector<int>> weights;
+
+
+    Robot(int player, std::string name, std::vector<std::vector<int>> weights)
+    {
+        this->player = player;
+        this->name = name;
+        this->weights = weights;
+    }
+
+    int chooseBoard()
+    {
+        // for now, always choose board 2
+        return 2;
+    }
+
+    void play(TicTacToe_Board &board)
+    {
+        // for now, always play in the center
+        board.play(player, 1, 1);
+    }
+
+};
+
+
 // Function to play a turn
 int playTurn(Human& player, int currentBoardNumber, BIG_TicTacToe_Board& bigBoard) {
     int oldBoardNumber = currentBoardNumber;
-    currentBoardNumber = player.play(bigBoard, (currentBoardNumber - 1) / 3, (currentBoardNumber - 1) % 3);
+    currentBoardNumber = player.play(bigBoard, (oldBoardNumber - 1) / 3, (oldBoardNumber - 1) % 3);
     bigBoard.play(player.player, (oldBoardNumber - 1) / 3, (oldBoardNumber - 1) % 3, (currentBoardNumber - 1) / 3, (currentBoardNumber - 1) % 3);
     return currentBoardNumber;
 }
 
-// Function to check for events and update the board
 bool checkAndUpdateBoard(Human& player, int oldBoardNumber, int currentBoardNumber, BIG_TicTacToe_Board& bigBoard) {
     if (bigBoard.checkSmallWin(player.player, (oldBoardNumber - 1) / 3, (oldBoardNumber - 1) % 3, (currentBoardNumber - 1) / 3, (currentBoardNumber - 1) % 3)) {
         std::cout << "Board " << oldBoardNumber << " has been won by " << player.name << std::endl;
         bigBoard.updateSimplifiedBoard((oldBoardNumber - 1) / 3, (oldBoardNumber - 1) % 3);
-    }
-    if (bigBoard.getBoard((currentBoardNumber - 1) / 3, (currentBoardNumber - 1) % 3).gameOver) {
-        currentBoardNumber = bigBoard.chooseAdjacentBoard(currentBoardNumber);
     }
     bigBoard.print();
     return bigBoard.isBigGameOver();
@@ -562,34 +587,41 @@ bool checkAndUpdateBoard(Human& player, int oldBoardNumber, int currentBoardNumb
 
 void game(Human Human1, Human Human2) {
     BIG_TicTacToe_Board bigBoard;
-    TicTacToe_Board currentBoard;
-    int currentBoardNumber, oldBoardNumber, bigRow, bigCol;
+    int currentBoardNumber, oldBoardNumber;
 
-    std::cout << "Game starts, "<< Human1.name << " (Human) : " << Human1.player << " vs " << Human2.name << " (Human) : " << Human2.player << std::endl;
+    std::cout << "Game starts, " << Human1.name << " (Human) : " << Human1.player << " vs " << Human2.name << " (Human) : " << Human2.player << std::endl;
     bigBoard.print();
 
     currentBoardNumber = Human2.chooseValidBoard();
 
     while (true) {
+        oldBoardNumber = currentBoardNumber;
         currentBoardNumber = playTurn(Human1, currentBoardNumber, bigBoard);
-        if (checkAndUpdateBoard(Human1, currentBoardNumber, currentBoardNumber, bigBoard)) {
+        if (bigBoard.getBoard((currentBoardNumber - 1) / 3, (currentBoardNumber - 1) % 3).gameOver) {
+        currentBoardNumber = bigBoard.chooseAdjacentBoard(currentBoardNumber);
+        }   
+        if (checkAndUpdateBoard(Human1, oldBoardNumber, currentBoardNumber, bigBoard)) {
+            std::cout << Human1.name << " wins!" << std::endl;
             break;
         }
+        oldBoardNumber = currentBoardNumber;
         currentBoardNumber = playTurn(Human2, currentBoardNumber, bigBoard);
-        if (checkAndUpdateBoard(Human2, currentBoardNumber, currentBoardNumber, bigBoard)) {
+        if (bigBoard.getBoard((currentBoardNumber - 1) / 3, (currentBoardNumber - 1) % 3).gameOver) {
+        currentBoardNumber = bigBoard.chooseAdjacentBoard(currentBoardNumber);
+        }
+        if (checkAndUpdateBoard(Human2, oldBoardNumber, currentBoardNumber, bigBoard)) {
+            std::cout << Human2.name << " wins!" << std::endl;
             break;
         }
     }
     std::cout << "Game over." << std::endl;
 }
 
-int main()
-{
+int main() {
     Human Human1(1, "Player 1");
     Human Human2(2, "Player 2");
 
     game(Human1, Human2);
-    
 
     return 0;
 }
